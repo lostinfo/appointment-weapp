@@ -2,92 +2,38 @@
 	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
 		{
 			"path": "pages/index/index",
-			"style": {}
-		},
-		{
-			"path": "pages/product/products",
 			"style": {
-				"enablePullDownRefresh": true
+				"navigationBarTitleText": "麦卡车活动中心"
 			}
-		},
-		{
-			"path": "pages/events/events",
-			"style": {}
 		},
 		{
 			"path": "pages/user/user",
-			"style": {}
+			"style": {
+				"navigationBarTitleText": "个人中心"
+			}
 		},
 		{
 			"path": "pages/login/login",
-			"style": {}
+			"style": {
+				"navigationBarTitleText": "登陆"
+			}
 		},
 		{
 			"path": "pages/article/article",
-			"style": {}
-		},
-		{
-			"path": "pages/product/product",
-			"style": {}
-		},
-		{
-			"path": "pages/order/orders",
 			"style": {
-				"enablePullDownRefresh": true
+				"navigationBarTitleText": "新闻资讯"
 			}
 		},
 		{
-			"path": "pages/order/order",
+			"path": "pages/activity/activity",
 			"style": {
-				"enablePullDownRefresh": true
+				"navigationBarTitleText": "活动详情"
 			}
-		},
-		{
-			"path": "pages/instructor/product",
-			"style": {}
-		},
-		{
-			"path": "pages/instructor/orders",
-			"style": {
-				"enablePullDownRefresh": true
-			}
-		},
-		{
-			"path": "pages/instructor/order",
-			"style": {
-				"enablePullDownRefresh": true
-			}
-		},
-		{
-			"path": "pages/card/card",
-			"style": {}
-		},
-		{
-			"path": "pages/user_card/user_cards",
-			"style": {
-				"enablePullDownRefresh": true
-			}
-		},
-		{
-			"path": "pages/user_card/user_card",
-			"style": {
-				"enablePullDownRefresh": true
-			}
-		},
-		{
-			"path": "pages/user_coupon/user_coupons",
-			"style": {
-				"enablePullDownRefresh": true
-			}
-		},
-		{
-			"path": "pages/card/query_discount",
-			"style": {}
 		}
 	],
 	"tabBar": {
 		"color": "#8799a3",
-		"selectedColor": "#38c1e8",
+		"selectedColor": "#539de6",
 		"borderStyle": "black",
 		"backgroundColor": "#ffffff",
 		"list": [
@@ -98,18 +44,6 @@
 				"selectedIconPath": "static/icon_index_selected.png"
 			},
 			{
-				"pagePath": "pages/product/products",
-				"text": "购票",
-				"iconPath": "static/icon_products.png",
-				"selectedIconPath": "static/icon_products_selected.png"
-			},
-			{
-				"pagePath": "pages/events/events",
-				"text": "活动",
-				"iconPath": "static/icon_event.png",
-				"selectedIconPath": "static/icon_event_selected.png"
-			},
-			{
 				"pagePath": "pages/user/user",
 				"text": "个人中心",
 				"iconPath": "static/icon_user.png",
@@ -118,6 +52,10 @@
 		]
 	},
 	"globalStyle": {
-		"navigationStyle": "custom"
+		//		"navigationStyle": "custom"
+		"navigationStyle": "default",
+		"navigationBarTextStyle": "white",
+		"navigationBarTitleText": "演示",
+		"navigationBarBackgroundColor": "#539de6"
 	}
 }

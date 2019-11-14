@@ -365,8 +365,8 @@ radio.wathet[checked] .wx-radio-input,
 switch.wathet.checked .uni-switch-input,
 checkbox.wathet.checked .uni-checkbox-input,
 radio.wathet.checked .uni-radio-input {
-	background-color: #38c1e8 !important;
-	border-color: #38c1e8 !important;
+	background-color: #539de6 !important;
+	border-color: #539de6 !important;
 	color: #ffffff !important;
 }
 
@@ -3376,7 +3376,7 @@ scroll-view.cu-steps .cu-item {
 
 .line-wathet::after,
 .lines-wathet::after {
-	border-color: #38c1e8;
+	border-color: #539de6;
 }
 
 .line-purple::after,
@@ -3455,7 +3455,7 @@ scroll-view.cu-steps .cu-item {
 }
 
 .bg-wathet {
-	background-color: #38c1e8;
+	background-color: #539de6;
 	color: #ffffff;
 }
 
@@ -3545,7 +3545,7 @@ scroll-view.cu-steps .cu-item {
 }
 
 .bg-wathet.light {
-	color: #38c1e8;
+	color: #539de6;
 	background-color: #cce6ff;
 }
 
@@ -3900,7 +3900,7 @@ scroll-view.cu-steps .cu-item {
 .text-wathet,
 .line-wathet,
 .lines-wathet {
-	color: #38c1e8;
+	color: #539de6;
 }
 
 .text-purple,

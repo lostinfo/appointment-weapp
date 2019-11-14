@@ -1,9 +1,9 @@
 <template>
   <view>
-    <cu-custom bgColor="bg-wathet" :isBack="true">
-      <block slot="backText">返回</block>
-      <block slot="content">登录</block>
-    </cu-custom>
+<!--    <cu-custom bgColor="bg-wathet" :isBack="true">-->
+<!--      <block slot="backText">返回</block>-->
+<!--      <block slot="content">登录</block>-->
+<!--    </cu-custom>-->
     <view class="logo-wrap">
       <view class="logo">
         <image src="/static/logo.png"></image>

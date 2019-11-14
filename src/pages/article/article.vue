@@ -1,11 +1,12 @@
 <template>
   <view>
-    <cu-custom bgColor="bg-wathet" :isBack="true">
-      <block slot="backText">返回</block>
-      <block slot="content">{{title}}</block>
-    </cu-custom>
-    <view class="padding-sm">
-      <rich-text :nodes="article.content" v-if="article"></rich-text>
+<!--    <cu-custom bgColor="bg-wathet" :isBack="true">-->
+<!--      <block slot="backText">返回</block>-->
+<!--      <block slot="content">{{title}}</block>-->
+<!--    </cu-custom>-->
+    <view class="padding-sm" v-if="article">
+      <view class="text-lg text-bold text-black padding-tb-sm">{{article.title}}</view>
+      <rich-text :nodes="article.content"></rich-text>
     </view>
   </view>
 </template>
@@ -23,7 +24,7 @@
       }
     },
     onLoad(options) {
-      if (options.id == undefined && options.code == undefined) {
+      if (options.id == undefined) {
         uni.showToast({
           icon: 'none',
           title: '参数错误'
@@ -32,29 +33,14 @@
           uni.navigateBack()
         }, 1000)
       } else {
-        let id = options.id
-        let code = options.code
-        if (id) {
-          this.id = id
-          this.type = 'id'
-        }
-        if (code) {
-          this.code = code
-          this.type = 'code'
-        }
+        this.id = options.id
         this.getArticle()
       }
     },
     methods: {
       getArticle() {
-        let that = this, url
-        if (that.type == 'id') {
-          url = '/article/' + that.id
-        } else {
-          url = '/article/code/' + that.code
-        }
-        that.$http.get(url).then(res => {
-          that.title = res.title
+        let that = this
+        that.$http.get('/article/' + that.id).then(res => {
           that.article = res
         })
       },
