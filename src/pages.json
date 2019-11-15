@@ -3,7 +3,8 @@
 		{
 			"path": "pages/index/index",
 			"style": {
-				"navigationBarTitleText": "麦卡车活动中心"
+				"navigationBarTitleText": "麦卡车活动中心",
+				"enablePullDownRefresh": true
 			}
 		},
 		{

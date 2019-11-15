@@ -1,5 +1,5 @@
 <template>
-  <view>
+  <view class="bg-white" style="height: 100%">
 <!--    <cu-custom bgColor="bg-wathet" :isBack="true">-->
 <!--      <block slot="backText">返回</block>-->
 <!--      <block slot="content">登录</block>-->
@@ -10,7 +10,7 @@
       </view>
     </view>
     <view class="login-btn-wrap">
-      <view class="login-desc">点击登录按钮即可购票、查看票券</view>
+      <view class="login-desc">点击登录体验更多功能</view>
       <button open-type="getUserInfo" @getuserinfo="onGetUserInfo" class="login-btn">登 录</button>
     </view>
   </view>
@@ -80,9 +80,15 @@
   }
 </script>
 
+<style>
+  page {
+    height: 100%;
+  }
+</style>
+
 <style scoped>
   .logo-wrap{
-    margin-top: 300upx;
+    padding-top: 300upx;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -106,7 +112,7 @@
     border-radius: 2.5em;
     height: 2.5em;
     line-height: 2.5em;
-    background: linear-gradient(to bottom right, #63BDE2 , #6FDAE4);
+    background: linear-gradient(to bottom right, #539de6 , rgba(83, 157, 230, 0.51));
     border: unset;
     color: #FFFFFF;
     font-weight: 400;

@@ -1,8 +1,8 @@
 <template>
   <view>
-<!--    <cu-custom bgColor="bg-wathet">-->
-<!--      <block slot="content">麦卡车活动中心</block>-->
-<!--    </cu-custom>-->
+    <!--    <cu-custom bgColor="bg-wathet">-->
+    <!--      <block slot="content">麦卡车活动中心</block>-->
+    <!--    </cu-custom>-->
     <view>
       <swiper class="screen-swiper square-dot" :indicator-dots="true" :circular="true"
               :autoplay="true" interval="5000" duration="500" style="background-color: #8799a3;min-height: 420upx;">
@@ -18,21 +18,27 @@
             <image :src="getPath(activity.image_url)"
                    mode="widthFix"></image>
             <view class="cu-tag bg-blue">{{activity.activity_status_label}}</view>
-            <view class="cu-bar bg-shadeBottom"> <text class="text-cut">{{activity.name}}</text></view>
+            <view class="cu-bar bg-shadeBottom">
+              <text class="text-cut">{{activity.name}}</text>
+            </view>
           </view>
           <view class="cu-list menu">
             <view class="cu-item">
               <view class="content flex-sub">
                 <view class="text-gray text-sm">
-                  <text class="cuIcon-locationfill margin-right-sm"></text>{{activity.activity_address}}
+                  <text class="cuIcon-locationfill margin-right-sm"></text>
+                  <text>{{activity.activity_address}}</text>
                 </view>
                 <view class="text-gray text-sm flex justify-between">
                   <view clss="flex-sub">
-                    <text class="cuIcon-timefill margin-right-sm"></text>{{activity.post_date_range}}
+                    <text class="cuIcon-timefill margin-right-sm"></text>
+                    <text>{{activity.post_date_range}}</text>
                   </view>
                   <view class="text-gray text-sm">
-                    <text class="cuIcon-attentionfill margin-lr-xs"></text> 99
-                    <text class="cuIcon-peoplefill margin-lr-xs"></text> 99
+                    <text class="cuIcon-attentionfill margin-lr-xs"></text>
+                    <text>{{activity.view_count}}</text>
+                    <text class="cuIcon-peoplefill margin-lr-xs"></text>
+                    <text>{{activity.join_count}}</text>
                   </view>
                 </view>
               </view>
@@ -167,7 +173,7 @@
         let that = this
         let index = e.currentTarget.dataset.index
         let swiper = that.swipers[index]
-        if (!swiper.navigate_path){
+        if (!swiper.navigate_path) {
           return
         }
         if (swiper.is_tabbar) {
