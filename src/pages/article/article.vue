@@ -42,6 +42,9 @@
         let that = this
         that.$http.get('/article/' + that.id).then(res => {
           that.article = res
+          uni.setNavigationBarTitle({
+            title: res.title
+          })
         })
       },
     },
