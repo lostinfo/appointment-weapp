@@ -30,6 +30,13 @@
 			"style": {
 				"navigationBarTitleText": "活动详情"
 			}
+		},
+		{
+			"path": "pages/user_activity/user_activities",
+			"style": {
+				"navigationBarTitleText": "我的预约",
+				"enablePullDownRefresh": true
+			}
 		}
 	],
 	"tabBar": {

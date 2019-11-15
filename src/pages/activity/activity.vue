@@ -100,7 +100,7 @@
           <view v-for="(join_user, index) in join_users">
             <view class="cu-avatar round margin-left"
                   :style="'background-image:url(' + join_user.user_avatar_url + ');'"></view>
-            <view class="text-black text-xs" style="word-break: break-all">{{join_user.user_nickname}}</view>
+            <view class="text-black text-xs padding-lr-xs" style="word-break: break-all">{{join_user.user_nickname}}</view>
           </view>
         </view>
         <view class="text-grey text-center padding-tb-sm">等 {{activity.join_count}} 人参与了活动</view>
@@ -108,7 +108,8 @@
       <view style="padding-bottom: calc(100upx + env(safe-area-inset-bottom) / 2);"></view>
       <navigator class="cu-bar bg-white tabbar border shop foot bg-white" v-if="!user" hover-class="none"
                  url="/pages/login/login" open-type="navigate">
-        <button class="action">
+<!--        <button class="action">-->
+        <button class="action" open-type="share">>
           <view class="cuIcon-share text-green">
             <!--            <view class="cu-tag"></view>-->
           </view>
@@ -119,7 +120,8 @@
         <view class="bg-grey submit" v-if="activity.activity_status == 20">活动已结束</view>
       </navigator>
       <view class="cu-bar bg-white tabbar border shop foot bg-white" v-else>
-        <button class="action" @tap="shareActivity">
+<!--        <button class="action" open-type="share" @tap="shareActivity">-->
+        <button class="action" open-type="share">
           <view class="cuIcon-share text-green">
             <!--            <view class="cu-tag"></view>-->
           </view>
@@ -175,7 +177,7 @@
         </view>
       </view>
     </view>
-    <canvas class="share-canvas" id="share-canvas" canvas-id="share-canvas" :style="{width:canvas_width+'px;',height: canvas_height+'px'}"></canvas>
+<!--    <canvas class="share-canvas" id="share-canvas" canvas-id="share-canvas" :style="{width:canvas_width+'px;',height: canvas_height+'px'}"></canvas>-->
   </view>
 </template>
 
@@ -241,9 +243,19 @@
       }
       this.canvas_width = 890 * this.$store.state.systemInfo.pixelRatio
       this.canvas_height = 1577 * this.$store.state.systemInfo.pixelRatio
+      // todo create qrcode
+      // this.has_qrcode = true
+      // this.qrcode_path = '/static/qrcode.png'
     },
     onShow() {
 
+    },
+    onShareAppMessage() {
+      return {
+        title: this.activity.name,
+        path: '/pages/activity/activity?id=' + this.id,
+        imageUrl: baseURL + this.activity.image_url
+      }
     },
     methods: {
       getActivity() {
@@ -353,7 +365,7 @@
             })
             setTimeout(() => {
               uni.redirectTo({
-                url: '/pages/user_activity/user_activity?id=' + res.id
+                url: '/pages/user_activity/user_activities'
               })
             }, 2000)
           })
@@ -364,6 +376,9 @@
         this.form_errors = []
       },
       shareActivity() {
+        // 先做转发
+
+        //
         let that = this
         if (!that.has_qrcode) {
           // get qrcode
@@ -404,22 +419,17 @@
           })
         })
       },
-      async down(urls) {
-        let paths = []
-        for (let url of urls) {
-          paths.push(await this.downloadFile(url))
-        }
-        return paths
-      },
       drawImage(canvasAttrs) {
         let that = this
-        let paths = that.down([
-          'http://hd.91mkc.localhost/storage/activity/iML5tFwqAlZ8jxwYI42eNkaYNILsGz4yGygsyReO.png',
-          'http://hd.91mkc.localhost/storage/activity/e2EBg12iAUrNqVZjkAUuLPH0ZFzYM46vLcWyoDUf.jpeg'
-        ])
-        console.log(paths)
-        const qrcode_path = paths[0]
-        const bg_path = paths[1]
+        if (!that.has_qrcode) {
+          uni.showToast({
+            icon: 'none',
+            title: '获取分享二维码失败'
+          })
+          return false
+        }
+        let bg_path = '/static/share-bg.jpg'
+        let qrcode_path = that.qrcode_path
         const ctx = uni.createCanvasContext('share-canvas')
         let canvasW = canvasAttrs.width // 画布的真实宽度
         let canvasH = canvasAttrs.height //画布的真实高度
@@ -428,7 +438,7 @@
         let qrcodeH = 268 * pixelRatio
         // 890/2 - 268/2
         let qrcodeX = 331 * pixelRatio
-        let qrcodeY = 422 * pixelRatio
+        let qrcodeY = 1200 * pixelRatio
         console.log(bg_path, qrcode_path, canvasAttrs, canvasW, canvasH, qrcodeW, qrcodeH, qrcodeX, qrcodeY)
         ctx.drawImage(bg_path, 0, 0, canvasW, canvasH)
         ctx.save()
@@ -466,9 +476,6 @@
   .share-canvas {
     background-color: #ffffff;
     position: absolute;
-    left: 0;
-    bottom: -1400upx;
-    /*width: 750upx;*/
-    /*height: 1400upx;*/
+    left: 1000upx;
   }
 </style>
