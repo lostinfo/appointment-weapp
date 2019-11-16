@@ -73,7 +73,7 @@
             </text>
           </view>
           <view class="action">
-            <button class="cu-btn sm bg-wathet shadow">
+            <button class="cu-btn sm bg-wathet shadow" @tap="locationAddress">
               <text class="cuIcon-location"></text>
               导航
             </button>
@@ -120,8 +120,8 @@
         <view class="bg-grey submit" v-if="activity.activity_status == 20">活动已结束</view>
       </navigator>
       <view class="cu-bar bg-white tabbar border shop foot bg-white" v-else>
-<!--        <button class="action" open-type="share" @tap="shareActivity">-->
-        <button class="action" open-type="share">
+        <button class="action" @tap="shareActivity">
+<!--        <button class="action" open-type="share">-->
           <view class="cuIcon-share text-green">
             <!--            <view class="cu-tag"></view>-->
           </view>
@@ -177,7 +177,21 @@
         </view>
       </view>
     </view>
-<!--    <canvas class="share-canvas" id="share-canvas" canvas-id="share-canvas" :style="{width:canvas_width+'px;',height: canvas_height+'px'}"></canvas>-->
+    <view class="cu-modal" :class="show_share_image?'show':''">
+      <view class="cu-dialog">
+        <view class="bg-img" :style="'background-image: url(' + share_image +');height:200px;'" v-if="share_image != ''">
+          <view class="cu-bar justify-end text-white">
+            <view class="action" @tap="hideShareImage">
+              <text class="cuIcon-close "></text>
+            </view>
+          </view>
+        </view>
+        <view class="cu-bar bg-white">
+          <view class="action margin-0 flex-sub  solid-left" @tap="saveShareImage">保存到手机</view>
+        </view>
+      </view>
+    </view>
+    <canvas class="share-canvas" id="share-canvas" canvas-id="share-canvas" :style="{width:canvas_width+'px;',height: canvas_height+'px'}"></canvas>
   </view>
 </template>
 
@@ -212,12 +226,18 @@
         form_errors: [],
         appointment_type_options: [],
         join_users: [],
+        // 扫码进入
+        share_user_id: '',
         // share
         canvas_width: '',
         canvas_height: '',
+        qrcode_url: '',
         has_qrcode: false,
         qrcode_path: '',
-        sharePath: '',
+        has_bg: false,
+        bg_path: '',
+        show_share_image: false,
+        share_image: '',
       }
     },
     components: {},
@@ -241,11 +261,15 @@
         this.getAppointmentTypeOptions()
         this.getJoinUsers()
       }
-      this.canvas_width = 890 * this.$store.state.systemInfo.pixelRatio
-      this.canvas_height = 1577 * this.$store.state.systemInfo.pixelRatio
+      // 505 2436
+      this.canvas_width = 505 * this.$store.state.systemInfo.pixelRatio
+      this.canvas_height = 2436 * this.$store.state.systemInfo.pixelRatio
+      if (options.u_id) {
+        this.share_user_id = options.u_id
+      }
       // todo create qrcode
-      // this.has_qrcode = true
-      // this.qrcode_path = '/static/qrcode.png'
+      this.has_qrcode = false
+      this.qrcode_path = ''
     },
     onShow() {
 
@@ -269,7 +293,10 @@
           })
           that.joinModel.id = that.activity.id
           that.$store.dispatch('waitLogin').then(() => {
-            // get join status
+            if (that.share_user_id != '') {
+              // 记录扫码
+              that.$http.post('/user-share-activity-logs', {share_user_id: that.share_user_id, activity_id: that.id})
+            }
           })
         })
       },
@@ -286,6 +313,14 @@
         let that = this
         that.$http.get('/activities/' + that.id + '/join-users').then(res => {
           that.join_users = res
+        })
+      },
+      locationAddress() {
+        uni.openLocation({
+          latitude: this.activity.latitude,
+          longitude: this.activity.longitude,
+          scale: 5,
+          name: this.activity.activity_address,
         })
       },
       showJoinModal() {
@@ -375,20 +410,56 @@
         this.show_form_errors = false
         this.form_errors = []
       },
-      shareActivity() {
-        // 先做转发
-
-        //
+      getQrcode() {
         let that = this
-        if (!that.has_qrcode) {
-          // get qrcode
-          that.$http.get('/activities/' + that.id + '/qrcode').then(res => {
-            that.has_qrcode = true
-            that.qrcode_path = baseURL + res.url
-            that.createShareCanvas()
+        return new Promise((resolve, reject) => {
+          that.$http.get('/activities/' + this.id + '/qrcode').then(res => {
+            resolve(res.url)
+          }).catch(() => {
+            reject()
           })
-        } else {
+        })
+      },
+      async shareActivity() {
+        let that = this
+        if (!that.$store.state.user) {
+          return false
+        }
+        if (that.share_image != '') {
+          that.showShareImage()
+          return false
+        }
+        uni.showLoading({
+          mask: true
+        })
+        try {
+          if (that.qrcode_url == '') {
+            // 获取二维码链接
+            const qrcode_url = await that.getQrcode()
+            that.qrcode_url= qrcode_url
+          }
+          if (!that.has_qrcode) {
+            // 下载二维码
+            const qrcode_path = await this.downloadFile(baseURL + that.qrcode_url)
+            // const qrcode_path = await this.downloadFile('https://hd.91mkc.com/storage/article/AjCjB77nzYRWBvUodqMny31LwP9mTnbka7mfYbXC.png')
+            that.has_qrcode = true
+            that.qrcode_path = qrcode_path
+          }
+          if (!that.has_bg) {
+            // 下载背景
+            const bg_path = await this.downloadFile(baseURL + '/storage/share-bg.jpeg')
+            // const bg_path = await that.downloadFile('https://hd.91mkc.com/storage/article/kUK5Yen3Voh62kHG6MNIXqQuWj9WsnlyDnBiT8U5.jpeg')
+            that.has_bg = true
+            that.bg_path = bg_path
+          }
           that.createShareCanvas()
+        } catch (e) {
+          console.log(e)
+          uni.hideLoading()
+          uni.showToast({
+            icon: 'none',
+            title: e
+          })
         }
       },
       createShareCanvas() {
@@ -421,24 +492,18 @@
       },
       drawImage(canvasAttrs) {
         let that = this
-        if (!that.has_qrcode) {
-          uni.showToast({
-            icon: 'none',
-            title: '获取分享二维码失败'
-          })
-          return false
-        }
-        let bg_path = '/static/share-bg.jpg'
+        let bg_path = that.bg_path
         let qrcode_path = that.qrcode_path
         const ctx = uni.createCanvasContext('share-canvas')
         let canvasW = canvasAttrs.width // 画布的真实宽度
         let canvasH = canvasAttrs.height //画布的真实高度
         let pixelRatio = this.$store.state.systemInfo.pixelRatio
-        let qrcodeW = 268 * pixelRatio
-        let qrcodeH = 268 * pixelRatio
-        // 890/2 - 268/2
-        let qrcodeX = 331 * pixelRatio
-        let qrcodeY = 1200 * pixelRatio
+        // 505 2436
+        let qrcodeW = 120 * pixelRatio
+        let qrcodeH = 120 * pixelRatio
+        // 505/2 - 120/2
+        let qrcodeX = 192.5 * pixelRatio
+        let qrcodeY = 1050 * pixelRatio
         console.log(bg_path, qrcode_path, canvasAttrs, canvasW, canvasH, qrcodeW, qrcodeH, qrcodeX, qrcodeY)
         ctx.drawImage(bg_path, 0, 0, canvasW, canvasH)
         ctx.save()
@@ -455,15 +520,28 @@
             destWidth: canvasW,
             destHeight: canvasH,
             success: (res) => {
-              that.sharePath = res.tempFilePath
-              uni.previewImage({
-                urls: [res.tempFilePath],
-                current: res.tempFilePath
-              })
+              uni.hideLoading()
+              that.share_image = res.tempFilePath
+              that.showShareImage()
             }
           })
-        }, 200)
-      }
+        }, 500)
+      },
+      showShareImage() {
+        let that = this
+        if (that.share_image == '') {
+          return false
+        }
+        that.show_share_image = true
+      },
+      hideShareImage() {
+        let that = this
+        that.show_share_image = false
+      },
+      saveShareImage() {
+        let that = this
+        // todo save
+      },
     },
   }
 </script>

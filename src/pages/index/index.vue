@@ -84,32 +84,17 @@
     },
     onLoad(o) {
       let that = this
-      if (o.q) {
-        // 获取二维码字符串
-        let q = decodeURIComponent(o.q)
-        q = q.substring(q.lastIndexOf('/') + 1)
-
-        let action = ''
-        let params = {}
-        // 获取出action
-        let index = q.indexOf('?')
-        if (-1 == index) {
-          action = q
-        } else {
-          action = q.substr(0, index)
-          let paramsStr = q.substr(index + 1)
-          let paramsArr = paramsStr.split("&")
-          paramsArr.forEach(function (item) {
-            let arr = item.split('=')
-            let key = arr[0]
-            let value = arr[1]
-            params[key] = value
-          })
+      if (o.type) {
+        let type = o.type
+        switch (type) {
+          case 'activity':
+            let id = o.id
+            let u_id = o.u_id
+            uni.navigateTo({
+              url: '/pages/activity/activity?id=' + id + '&u_id=' + u_id
+            })
+            break
         }
-        switch (action) {
-          // todo action
-        }
-        console.log(action, params)
       }
       this.getSwipers()
       this.getActivities()
