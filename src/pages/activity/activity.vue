@@ -12,7 +12,7 @@
                    mode="widthFix"></image>
             <view class="cu-tag bg-blue">{{activity.activity_status_label}}</view>
             <view class="cu-bar bg-shadeBottom">
-              <text class="text-cut">{{activity.name}}</text>
+              <text>{{activity.name}}</text>
             </view>
           </view>
           <view class="cu-list menu">
@@ -104,7 +104,7 @@
             </view>
           </view>
         </view>
-        <view class="text-grey text-center padding-tb-sm">等 {{activity.join_count}} 人参与了活动</view>
+        <view class="text-grey text-center padding-tb-sm">总共 {{activity.join_count}} 人参与活动</view>
       </view>
       <view class="cu-bar bg-white margin-top-sm" v-if="scan_user_count > 0">
         <view class="action">
@@ -121,13 +121,13 @@
             </view>
           </view>
         </view>
-        <view class="text-grey text-center padding-tb-sm">等 {{scan_user_count}} 个扫码</view>
+        <view class="text-grey text-center padding-tb-sm">总共 {{scan_user_count}} 集赞扫描</view>
       </view>
       <view style="padding-bottom: calc(100upx + env(safe-area-inset-bottom) / 2);"></view>
       <navigator class="cu-bar bg-white tabbar border shop foot bg-white" v-if="!user" hover-class="none"
                  url="/pages/login/login" open-type="navigate">
-        <!--        <button class="action">-->
-        <button class="action" open-type="share">>
+                <button class="action">
+<!--        <button class="action" open-type="share">-->
           <view class="cuIcon-share text-green">
             <!--            <view class="cu-tag"></view>-->
           </view>
@@ -204,7 +204,7 @@
       </view>
     </view>
     <canvas class="share-canvas" id="share-canvas" canvas-id="share-canvas"
-            :style="{width:canvas_width+'px;',height: canvas_height+'px'}"></canvas>
+            :style="{width:canvas_width+'px;',height: canvas_height+'px', top: '-'+canvas_height+'px'}"></canvas>
   </view>
 </template>
 
@@ -279,9 +279,9 @@
         this.getAppointmentTypeOptions()
         this.getJoinUsers()
       }
-      // 505 2436
-      this.canvas_width = 505 * this.$store.state.systemInfo.pixelRatio
-      this.canvas_height = 2436 * this.$store.state.systemInfo.pixelRatio
+      // 500 1726
+      this.canvas_width = 500 * this.$store.state.systemInfo.pixelRatio
+      this.canvas_height = 1726 * this.$store.state.systemInfo.pixelRatio
       if (options.u_id) {
         this.share_user_id = options.u_id
       }
@@ -318,12 +318,12 @@
             if (that.share_user_id != '') {
               // 记录扫码
               that.$http.post('/user-share-activity-logs', {share_user_id: that.share_user_id, activity_id: that.id})
-              // 推荐扫描
-              that.$http.get('/user-share-activity-logs/' + that.id).then(res => {
-                that.scan_user_count = res.count
-                that.scan_users = res.join_users
-              })
             }
+            // 推荐扫描
+            that.$http.get('/user-share-activity-logs/' + that.id).then(res => {
+              that.scan_user_count = res.count
+              that.scan_users = res.join_users
+            })
           })
         })
       },
@@ -457,7 +457,8 @@
           return false
         }
         if (that.share_image != '') {
-          that.showShareImage()
+          // that.showShareImage()
+          that.saveShareImage()
           return false
         }
         uni.showLoading({
@@ -472,14 +473,12 @@
           if (!that.has_qrcode) {
             // 下载二维码
             const qrcode_path = await this.downloadFile(baseURL + that.qrcode_url)
-            // const qrcode_path = await this.downloadFile('https://hd.91mkc.com/storage/article/AjCjB77nzYRWBvUodqMny31LwP9mTnbka7mfYbXC.png')
             that.has_qrcode = true
             that.qrcode_path = qrcode_path
           }
           if (!that.has_bg) {
             // 下载背景
             const bg_path = await this.downloadFile(baseURL + '/storage/share-bg.jpeg')
-            // const bg_path = await that.downloadFile('https://hd.91mkc.com/storage/article/kUK5Yen3Voh62kHG6MNIXqQuWj9WsnlyDnBiT8U5.jpeg')
             that.has_bg = true
             that.bg_path = bg_path
           }
@@ -529,12 +528,12 @@
         let canvasW = canvasAttrs.width // 画布的真实宽度
         let canvasH = canvasAttrs.height //画布的真实高度
         let pixelRatio = this.$store.state.systemInfo.pixelRatio
-        // 505 2436
-        let qrcodeW = 150 * pixelRatio
-        let qrcodeH = 150 * pixelRatio
-        // 505/2 - 150/2
-        let qrcodeX = 177.5 * pixelRatio
-        let qrcodeY = 630 * pixelRatio
+        // 500 1726
+        let qrcodeW = 180 * pixelRatio
+        let qrcodeH = 180 * pixelRatio
+        // 500/2 - 180/2
+        let qrcodeX = 160 * pixelRatio
+        let qrcodeY = 610 * pixelRatio
         console.log(bg_path, qrcode_path, canvasAttrs, canvasW, canvasH, qrcodeW, qrcodeH, qrcodeX, qrcodeY)
         ctx.drawImage(bg_path, 0, 0, canvasW, canvasH)
         ctx.save()
@@ -593,7 +592,8 @@
 
   .share-canvas {
     background-color: #ffffff;
+    zoom: 20%;
     position: absolute;
-    left: 1000upx;
+    left: -10000px;
   }
 </style>

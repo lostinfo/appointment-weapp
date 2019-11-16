@@ -19,7 +19,7 @@
                    mode="widthFix"></image>
             <view class="cu-tag bg-blue">{{activity.activity_status_label}}</view>
             <view class="cu-bar bg-shadeBottom">
-              <text class="text-cut">{{activity.name}}</text>
+              <text>{{activity.name}}</text>
             </view>
           </view>
           <view class="cu-list menu">
