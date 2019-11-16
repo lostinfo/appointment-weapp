@@ -84,8 +84,29 @@
     },
     onLoad(o) {
       let that = this
-      if (o.type) {
-        let type = o.type
+      if (o.scene) {
+        // 获取二维码字符串
+        let params_str = decodeURIComponent(o.scene)
+        console.log(params_str)
+        let params_items = params_str.split('&')
+        let params = {}
+        params_items.forEach((item) => {
+          let arr = item.split('=')
+          params[arr[0]] = arr[1]
+        })
+        switch (params.type) {
+          case 'activity':
+            let id = params.id
+            let u_id = params.u_id
+            uni.navigateTo({
+              url: '/pages/activity/activity?id=' + id + '&u_id=' + u_id
+            })
+            break
+        }
+        console.log(params)
+      }
+      if (o.scene) {
+        let type = o.scene
         switch (type) {
           case 'activity':
             let id = o.id

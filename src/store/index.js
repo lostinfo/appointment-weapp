@@ -75,7 +75,7 @@ const store = new Vuex.Store({
 						clearInterval(sh)
 						resolve()
 					}
-					if (sleep_count > 100) {
+					if (sleep_count > 500) {
 						clearInterval(sh)
 						reject()
 					}

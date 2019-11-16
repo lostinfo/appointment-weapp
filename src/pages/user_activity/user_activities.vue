@@ -20,10 +20,11 @@
         </view>
         <view class="padding-sm">
           <view class="flex-sub margin-lr-sm">
-            <view class="text-grey text-df padding-tb-xs">预约类型：{{user_activity.appointment_type_label}}</view>
-            <view class="text-grey text-df padding-tb-xs">报名时间：{{user_activity.activity.post_date_range}}</view>
-            <view class="text-grey text-df padding-tb-xs">活动时间：{{user_activity.activity.activity_date_range}}</view>
-            <view class="text-grey text-df padding-tb-xs">活动地址：{{user_activity.activity.activity_address}}</view>
+            <view class="text-grey text-df padding-tb-sm">预约类型：{{user_activity.appointment_type_label}}</view>
+            <view class="text-grey text-df padding-tb-sm" v-if="user_activity.option_label != null">{{user_activity.option_label}}：{{user_activity.option_value}}</view>
+            <view class="text-grey text-df padding-tb-sm">报名时间：{{user_activity.activity.post_date_range}}</view>
+            <view class="text-grey text-df padding-tb-sm">活动时间：{{user_activity.activity.activity_date_range}}</view>
+            <view class="text-grey text-df padding-tb-sm">活动地址：{{user_activity.activity.activity_address}}</view>
           </view>
           <view class="solid-top flex justify-end padding-tb-sm">
             <button class="cu-btn line-gray" v-if="user_activity.join_status == 10" :data-id="user_activity.id" @tap="cancelJoin">取消预约</button>

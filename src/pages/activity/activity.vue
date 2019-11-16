@@ -92,23 +92,41 @@
       <view class="cu-bar bg-white margin-top-sm" v-if="join_users.length > 0">
         <view class="action">
           <text class="cuIcon-title text-wathet text-df"></text>
-          <text>参与用户</text>
+          <text>参与活动用户</text>
         </view>
       </view>
       <view class="bg-white" v-if="join_users.length > 0">
         <view class="grid col-5">
-          <view v-for="(join_user, index) in join_users">
+          <view v-for="(join_user, index) in join_users" :key="index">
             <view class="cu-avatar round margin-left"
                   :style="'background-image:url(' + join_user.user_avatar_url + ');'"></view>
-            <view class="text-black text-xs padding-lr-xs" style="word-break: break-all">{{join_user.user_nickname}}</view>
+            <view class="text-black text-xs padding-lr-xs" style="word-break: break-all">{{join_user.user_nickname}}
+            </view>
           </view>
         </view>
         <view class="text-grey text-center padding-tb-sm">等 {{activity.join_count}} 人参与了活动</view>
       </view>
+      <view class="cu-bar bg-white margin-top-sm" v-if="scan_user_count > 0">
+        <view class="action">
+          <text class="cuIcon-title text-wathet text-df"></text>
+          <text>我的积攒用户</text>
+        </view>
+      </view>
+      <view class="bg-white" v-if="scan_user_count > 0">
+        <view class="grid col-5">
+          <view v-for="(scan_user, index) in scan_users" :key="index">
+            <view class="cu-avatar round margin-left"
+                  :style="'background-image:url(' + scan_user.avatar_url + ');'"></view>
+            <view class="text-black text-xs padding-lr-xs" style="word-break: break-all">{{scan_user.nickname}}
+            </view>
+          </view>
+        </view>
+        <view class="text-grey text-center padding-tb-sm">等 {{scan_user_count}} 个扫码</view>
+      </view>
       <view style="padding-bottom: calc(100upx + env(safe-area-inset-bottom) / 2);"></view>
       <navigator class="cu-bar bg-white tabbar border shop foot bg-white" v-if="!user" hover-class="none"
                  url="/pages/login/login" open-type="navigate">
-<!--        <button class="action">-->
+        <!--        <button class="action">-->
         <button class="action" open-type="share">>
           <view class="cuIcon-share text-green">
             <!--            <view class="cu-tag"></view>-->
@@ -121,7 +139,7 @@
       </navigator>
       <view class="cu-bar bg-white tabbar border shop foot bg-white" v-else>
         <button class="action" @tap="shareActivity">
-<!--        <button class="action" open-type="share">-->
+          <!--        <button class="action" open-type="share">-->
           <view class="cuIcon-share text-green">
             <!--            <view class="cu-tag"></view>-->
           </view>
@@ -156,6 +174,14 @@
                      :checked="joinModel.appointment_type == type.value ? 'checked' : ''" :value="type.value"></radio>
             </view>
           </radio-group>
+          <view class="cu-form-group margin-top" v-if="activity.options.length > 0">
+            <view class="title">{{activity.option_label}}</view>
+            <picker @change="activityOptionChange" :value="joinModel.option_index" :range="activity.options">
+              <view class="picker">
+                {{joinModel.option_index > -1 ? activity.options[joinModel.option_index]:''}}
+              </view>
+            </picker>
+          </view>
           <view class="padding-top flex flex-direction">
             <button class="cu-btn bg-wathet lg" @tap="submit">提交</button>
           </view>
@@ -177,21 +203,8 @@
         </view>
       </view>
     </view>
-    <view class="cu-modal" :class="show_share_image?'show':''">
-      <view class="cu-dialog">
-        <view class="bg-img" :style="'background-image: url(' + share_image +');height:200px;'" v-if="share_image != ''">
-          <view class="cu-bar justify-end text-white">
-            <view class="action" @tap="hideShareImage">
-              <text class="cuIcon-close "></text>
-            </view>
-          </view>
-        </view>
-        <view class="cu-bar bg-white">
-          <view class="action margin-0 flex-sub  solid-left" @tap="saveShareImage">保存到手机</view>
-        </view>
-      </view>
-    </view>
-    <canvas class="share-canvas" id="share-canvas" canvas-id="share-canvas" :style="{width:canvas_width+'px;',height: canvas_height+'px'}"></canvas>
+    <canvas class="share-canvas" id="share-canvas" canvas-id="share-canvas"
+            :style="{width:canvas_width+'px;',height: canvas_height+'px'}"></canvas>
   </view>
 </template>
 
@@ -211,7 +224,9 @@
         joinModel: {
           id: '',
           mobile: '',
-          appointment_type: ''
+          appointment_type: '',
+          option_index: 0,
+          option_value: ''
         },
         joinRules: {
           mobile: [
@@ -228,6 +243,9 @@
         join_users: [],
         // 扫码进入
         share_user_id: '',
+        // 我的扫码用户
+        scan_user_count: 0,
+        scan_users: 0,
         // share
         canvas_width: '',
         canvas_height: '',
@@ -291,11 +309,20 @@
           uni.setNavigationBarTitle({
             title: res.name
           })
+          if (res.options.length > 0) {
+            that.joinModel.option_index = 0
+            that.joinModel.option_value = res.options[0]
+          }
           that.joinModel.id = that.activity.id
           that.$store.dispatch('waitLogin').then(() => {
             if (that.share_user_id != '') {
               // 记录扫码
               that.$http.post('/user-share-activity-logs', {share_user_id: that.share_user_id, activity_id: that.id})
+              // 推荐扫描
+              that.$http.get('/user-share-activity-logs/' + that.id).then(res => {
+                that.scan_user_count = res.count
+                that.scan_users = res.join_users
+              })
             }
           })
         })
@@ -373,6 +400,10 @@
       appointmentTypeChange(e) {
         this.joinModel.appointment_type = e.detail.value
       },
+      activityOptionChange(e) {
+        this.joinModel.option_index = e.detail.value
+        this.joinModel.option_value = this.activity.options[e.detail.value]
+      },
       submit() {
         let that = this
         //  checkLogin
@@ -436,7 +467,7 @@
           if (that.qrcode_url == '') {
             // 获取二维码链接
             const qrcode_url = await that.getQrcode()
-            that.qrcode_url= qrcode_url
+            that.qrcode_url = qrcode_url
           }
           if (!that.has_qrcode) {
             // 下载二维码
@@ -499,11 +530,11 @@
         let canvasH = canvasAttrs.height //画布的真实高度
         let pixelRatio = this.$store.state.systemInfo.pixelRatio
         // 505 2436
-        let qrcodeW = 120 * pixelRatio
-        let qrcodeH = 120 * pixelRatio
-        // 505/2 - 120/2
-        let qrcodeX = 192.5 * pixelRatio
-        let qrcodeY = 1050 * pixelRatio
+        let qrcodeW = 150 * pixelRatio
+        let qrcodeH = 150 * pixelRatio
+        // 505/2 - 150/2
+        let qrcodeX = 177.5 * pixelRatio
+        let qrcodeY = 630 * pixelRatio
         console.log(bg_path, qrcode_path, canvasAttrs, canvasW, canvasH, qrcodeW, qrcodeH, qrcodeX, qrcodeY)
         ctx.drawImage(bg_path, 0, 0, canvasW, canvasH)
         ctx.save()
@@ -522,7 +553,8 @@
             success: (res) => {
               uni.hideLoading()
               that.share_image = res.tempFilePath
-              that.showShareImage()
+              // that.showShareImage()
+              that.saveShareImage()
             }
           })
         }, 500)
@@ -540,7 +572,15 @@
       },
       saveShareImage() {
         let that = this
-        // todo save
+        uni.saveImageToPhotosAlbum({
+          filePath: that.share_image,
+          success(res) {
+            uni.showToast({
+              icon: 'none',
+              title: '保存成功'
+            })
+          }
+        })
       },
     },
   }
