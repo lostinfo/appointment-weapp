@@ -133,9 +133,7 @@
           </view>
           分享
         </button>
-        <view class="bg-grey submit" v-if="activity.activity_status == 0">活动未开始</view>
-        <view class="bg-wathet submit" v-if="activity.activity_status == 10">立即报名</view>
-        <view class="bg-grey submit" v-if="activity.activity_status == 20">活动已结束</view>
+        <view class="bg-wathet submit">点击登录参与活动</view>
       </navigator>
       <view class="cu-bar bg-white tabbar border shop foot bg-white" v-else>
         <button class="action" @tap="shareActivity">
@@ -152,7 +150,7 @@
       </view>
     </view>
     <view class="cu-modal bottom-modal" :class="show_join?'show':''">
-      <view class="cu-dialog">
+      <form report-submit="true" @submit="submit" class="cu-dialog">
         <view class="cu-bar bg-white">
           <view class="action text-blue"></view>
           <view class="action flex-sub">参加活动</view>
@@ -183,10 +181,10 @@
             </picker>
           </view>
           <view class="padding-top flex flex-direction">
-            <button class="cu-btn bg-wathet lg" @tap="submit">提交</button>
+            <button class="cu-btn bg-wathet lg" formType="submit">提交</button>
           </view>
         </view>
-      </view>
+      </form>
     </view>
     <view class="cu-modal" :class="show_form_errors?'show':''">
       <view class="cu-dialog">
@@ -404,8 +402,9 @@
         this.joinModel.option_index = e.detail.value
         this.joinModel.option_value = this.activity.options[e.detail.value]
       },
-      submit() {
+      submit(e) {
         let that = this
+        that.joinModel.form_id = e.detail.formId
         //  checkLogin
         if (!that.$store.state.user) {
           uni.navigateTo({
@@ -533,12 +532,22 @@
         let qrcodeH = 180 * pixelRatio
         // 500/2 - 180/2
         let qrcodeX = 160 * pixelRatio
-        let qrcodeY = 610 * pixelRatio
+        let qrcodeY = 650 * pixelRatio
         console.log(bg_path, qrcode_path, canvasAttrs, canvasW, canvasH, qrcodeW, qrcodeH, qrcodeX, qrcodeY)
         ctx.drawImage(bg_path, 0, 0, canvasW, canvasH)
         ctx.save()
         ctx.drawImage(qrcode_path, qrcodeX, qrcodeY, qrcodeW, qrcodeH)
         ctx.save()
+        let str = that.$store.state.user.nickname
+        let font_size = 24 * pixelRatio
+        let strX = 145 * pixelRatio
+        let strY = 854 * pixelRatio
+        //绘制名字
+        ctx.setFontSize(font_size)
+        ctx.setFillStyle('#F9DF77')
+        ctx.setTextAlign('left')
+        ctx.fillText(str, strX, strY)
+        ctx.stroke()
         ctx.draw()
         setTimeout(() => {
           uni.canvasToTempFilePath({
