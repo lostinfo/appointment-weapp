@@ -278,8 +278,10 @@
         this.getJoinUsers()
       }
       // 500 1726
-      this.canvas_width = 500 * this.$store.state.systemInfo.pixelRatio
-      this.canvas_height = 1726 * this.$store.state.systemInfo.pixelRatio
+      // this.canvas_width = 500 * this.$store.state.systemInfo.pixelRatio
+      // this.canvas_height = 1726 * this.$store.state.systemInfo.pixelRatio
+      this.canvas_width = 500 * 2
+      this.canvas_height = 1726 * 2
       if (options.u_id) {
         this.share_user_id = options.u_id
       }
@@ -461,6 +463,7 @@
           return false
         }
         uni.showLoading({
+          title: '生成海报中',
           mask: true
         })
         try {
@@ -511,6 +514,7 @@
             },
             success: (res) => {
               if (res.statusCode == 200) {
+                console.log('downloadFile', url)
                 resolve(res.tempFilePath)
               } else {
                 reject('文件下载失败')
@@ -520,52 +524,71 @@
         })
       },
       drawImage(canvasAttrs) {
+        console.log('drawImage', canvasAttrs)
         let that = this
-        let bg_path = that.bg_path
-        let qrcode_path = that.qrcode_path
-        const ctx = uni.createCanvasContext('share-canvas')
-        let canvasW = canvasAttrs.width // 画布的真实宽度
-        let canvasH = canvasAttrs.height //画布的真实高度
-        let pixelRatio = this.$store.state.systemInfo.pixelRatio
-        // 500 1726
-        let qrcodeW = 180 * pixelRatio
-        let qrcodeH = 180 * pixelRatio
-        // 500/2 - 180/2
-        let qrcodeX = 160 * pixelRatio
-        let qrcodeY = 650 * pixelRatio
-        console.log(bg_path, qrcode_path, canvasAttrs, canvasW, canvasH, qrcodeW, qrcodeH, qrcodeX, qrcodeY)
-        ctx.drawImage(bg_path, 0, 0, canvasW, canvasH)
-        ctx.save()
-        ctx.drawImage(qrcode_path, qrcodeX, qrcodeY, qrcodeW, qrcodeH)
-        ctx.save()
-        let str = that.$store.state.user.nickname
-        let font_size = 24 * pixelRatio
-        let strX = 145 * pixelRatio
-        let strY = 854 * pixelRatio
-        //绘制名字
-        ctx.setFontSize(font_size)
-        ctx.setFillStyle('#F9DF77')
-        ctx.setTextAlign('left')
-        ctx.fillText(str, strX, strY)
-        ctx.stroke()
-        ctx.draw()
-        setTimeout(() => {
-          uni.canvasToTempFilePath({
-            canvasId: 'share-canvas',
-            x: 0,
-            y: 0,
-            width: canvasW,
-            height: canvasH,
-            destWidth: canvasW,
-            destHeight: canvasH,
-            success: (res) => {
-              uni.hideLoading()
-              that.share_image = res.tempFilePath
-              // that.showShareImage()
-              that.saveShareImage()
-            }
-          })
-        }, 500)
+        uni.showLoading({
+          title: '生成海报中',
+          mask: true
+        })
+        try {
+          let bg_path = that.bg_path
+          let qrcode_path = that.qrcode_path
+          const ctx = uni.createCanvasContext('share-canvas')
+          let canvasW = canvasAttrs.width // 画布的真实宽度
+          let canvasH = canvasAttrs.height //画布的真实高度
+          // let pixelRatio = this.$store.state.systemInfo.pixelRatio
+          let pixelRatio = 2
+          // 500 1726
+          let qrcodeW = 180 * pixelRatio
+          let qrcodeH = 180 * pixelRatio
+          // 500/2 - 180/2
+          let qrcodeX = 160 * pixelRatio
+          let qrcodeY = 650 * pixelRatio
+          console.log(bg_path, qrcode_path, canvasAttrs, canvasW, canvasH, qrcodeW, qrcodeH, qrcodeX, qrcodeY)
+          ctx.drawImage(bg_path, 0, 0, canvasW, canvasH)
+          ctx.save()
+          ctx.drawImage(qrcode_path, qrcodeX, qrcodeY, qrcodeW, qrcodeH)
+          ctx.save()
+          let str = that.$store.state.user.nickname
+          let font_size = 24 * pixelRatio
+          let strX = 145 * pixelRatio
+          let strY = 854 * pixelRatio
+          //绘制名字
+          ctx.setFontSize(font_size)
+          ctx.setFillStyle('#F9DF77')
+          ctx.setTextAlign('left')
+          ctx.fillText(str, strX, strY)
+          ctx.stroke()
+          ctx.draw()
+          setTimeout(() => {
+            uni.canvasToTempFilePath({
+              canvasId: 'share-canvas',
+              x: 0,
+              y: 0,
+              width: canvasW,
+              height: canvasH,
+              destWidth: canvasW,
+              destHeight: canvasH,
+              success: (res) => {
+                uni.hideLoading()
+                that.share_image = res.tempFilePath
+                // that.showShareImage()
+                that.saveShareImage()
+              },
+              fail: (res) => {
+                uni.hideLoading()
+                uni.showToast({
+                  icon: 'none',
+                  title: '生成海报失败'
+                })
+                console.log(res)
+              }
+            })
+          }, 2000)
+        } catch (e) {
+          uni.hideLoading()
+          console.log(e)
+        }
       },
       showShareImage() {
         let that = this
@@ -587,6 +610,9 @@
               icon: 'none',
               title: '保存成功'
             })
+          },
+          fail(res) {
+            console.log(res)
           }
         })
       },
